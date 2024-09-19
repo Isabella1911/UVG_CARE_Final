@@ -3,6 +3,7 @@ plugins {
     alias(libs.plugins.jetbrains.kotlin.android)
 }
 android {
+    namespace = "com.uvg.uvgcare"
     compileSdk = 34
 
     defaultConfig {
@@ -26,10 +27,11 @@ android {
     // Enable Jetpack Compose
     buildFeatures {
         compose = true
+        viewBinding = true
     }
 
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.3"
+        kotlinCompilerExtensionVersion = "1.5.2"
     }
 
     compileOptions {
