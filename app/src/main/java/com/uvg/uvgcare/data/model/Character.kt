@@ -1,9 +1,10 @@
 package com.uvg.uvgcare.data.model
-
-class Things {
+import kotlinx.serialization.Serializable
+@Serializable
+class Character(
     val id: Int,
     val autor: String,
     val categoria: String,
     val contacto: String,
     val imagen: String
-}
+)

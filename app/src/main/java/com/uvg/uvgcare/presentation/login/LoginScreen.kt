@@ -36,7 +36,8 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.uvg.uvgcare.theme.UVGCareTheme
-
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.unit.sp
 @Composable
 fun LoginPantalla(
     modifier: Modifier = Modifier
@@ -95,9 +96,13 @@ fun Login(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(bottom = 64.dp), // Add space below the text
-            style = androidx.compose.material3.MaterialTheme.typography.bodyLarge, // Use appropriate text style
+            style = TextStyle(
+                fontSize = 30.sp, // Set your desired font size here
+                color = androidx.compose.material3.MaterialTheme.colorScheme.onSurface // Adjust color if needed
+            ),
             textAlign = androidx.compose.ui.text.style.TextAlign.Center // Center the text
         )
+
         OutlinedTextField(
             value = email,
             onValueChange = onEmailChange,
@@ -120,7 +125,7 @@ fun Login(
             text = "¿Olvido su contraseña?",
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(bottom = 8.dp),
+                .padding(bottom = 16.dp),
             style = androidx.compose.material3.MaterialTheme.typography.bodyMedium, // Use appropriate text style
             textAlign = androidx.compose.ui.text.style.TextAlign.Left // Center the text
         )
