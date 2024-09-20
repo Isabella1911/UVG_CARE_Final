@@ -63,7 +63,11 @@ dependencies {
     implementation("androidx.activity:activity-compose:1.8.0")
     implementation("androidx.navigation:navigation-compose:1.5.3")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.0")
+    // Material Design Components
+    implementation ("androidx.compose.material3:material3:1.1.0")
 
+    // Material Icons Extended (for access to all icons)
+    implementation("androidx.compose.material:material-icons-extended:1.5.0 ")
     // Test dependencies
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
