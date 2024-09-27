@@ -245,6 +245,7 @@ fun UVGCareTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     // Dynamic color is available on Android 12+
     dynamicColor: Boolean = true,
+    useMediumContrast: Boolean = false,
     content: @Composable () -> Unit
 ) {
     val colorScheme = when {
@@ -253,8 +254,10 @@ fun UVGCareTheme(
             if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
         }
 
-        darkTheme -> darkColorScheme()
-        else -> lightColorScheme()
+        darkTheme && useMediumContrast -> mediumContrastDarkColorScheme
+        darkTheme -> darkScheme
+        useMediumContrast -> mediumContrastLightColorScheme
+        else -> lightScheme
     }
 
     MaterialTheme(

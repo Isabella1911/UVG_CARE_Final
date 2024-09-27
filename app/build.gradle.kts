@@ -1,8 +1,10 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
+    kotlin("plugin.serialization") version "1.9.0"
 }
 android {
+    namespace = "com.uvg.uvgcare"
     compileSdk = 34
 
     defaultConfig {
@@ -26,10 +28,11 @@ android {
     // Enable Jetpack Compose
     buildFeatures {
         compose = true
+        viewBinding = true
     }
 
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.3"
+        kotlinCompilerExtensionVersion = "1.5.2"
     }
 
     compileOptions {
@@ -51,12 +54,17 @@ dependencies {
     implementation(libs.androidx.navigation.fragment.ktx)
     implementation(libs.androidx.navigation.ui.ktx)
 
+
     // Jetpack Compose Dependencies
     implementation("androidx.compose.ui:ui:1.5.3")
     implementation("androidx.compose.material3:material3:1.2.0")
     implementation("androidx.compose.ui:ui-tooling-preview:1.5.3")
     debugImplementation("androidx.compose.ui:ui-tooling:1.5.3")
     implementation("androidx.activity:activity-compose:1.8.0")
+    implementation("androidx.navigation:navigation-compose:1.5.3")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.0")
+    implementation("androidx.compose.material:material-icons-core:1.7.2")
+    implementation("androidx.compose.material:material-icons-extended:1.7.2")
 
     // Test dependencies
     testImplementation(libs.junit)

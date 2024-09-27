@@ -25,7 +25,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.uvg.uvgcare.theme.UVGCareTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -35,7 +37,7 @@ fun NetflixStyleScreen() {
             TopAppBar(
                 title = { Text("Categorias") },
                 colors = TopAppBarDefaults.mediumTopAppBarColors(
-                    containerColor = Color(0xFFFFEB3B)  // Usando el color de la barra superior anterior
+                    containerColor = MaterialTheme.colorScheme.primary // Usar el color primario del tema
                 )
             )
         }
@@ -64,6 +66,7 @@ fun CategorySection(categoryName: String) {
         Text(
             text = categoryName,
             style = MaterialTheme.typography.titleLarge,
+            color = MaterialTheme.colorScheme.onBackground, // Usar color de texto para el fondo del tema
             modifier = Modifier.padding(start = 16.dp, top = 16.dp, bottom = 8.dp)
         )
         LazyRow(
@@ -83,9 +86,13 @@ fun ListItem() {
         modifier = Modifier
             .width(150.dp)
             .height(200.dp)
-            .padding(end = 16.dp),  // Espacio entre ítems
+            .padding(end = 16.dp),
         shape = RoundedCornerShape(8.dp),
-        elevation = CardDefaults.cardElevation(4.dp)
+        elevation = CardDefaults.cardElevation(4.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surface,
+            contentColor = MaterialTheme.colorScheme.onSurface
+        )
     ) {
         Column(
             modifier = Modifier
@@ -107,15 +114,40 @@ fun ListItem() {
             // Texto de título
             Text(
                 text = "List item",
-                style = MaterialTheme.typography.titleMedium
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.onSurface
             )
 
             // Texto de descripción
             Text(
                 text = "Descripción corta",
                 style = MaterialTheme.typography.bodySmall,
-                color = Color.Gray
+                color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun PreviewNetflixStyleScreenLight() {
+    UVGCareTheme(darkTheme = false) { // Tema claro
+        NetflixStyleScreen()
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun PreviewNetflixStyleScreenDark() {
+    UVGCareTheme(darkTheme = true) { // Tema oscuro
+        NetflixStyleScreen()
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun PreviewNetflixStyleScreenMediumContrast() {
+    UVGCareTheme(useMediumContrast = true) { // Tema de contraste medio
+        NetflixStyleScreen()
     }
 }
