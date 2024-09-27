@@ -23,7 +23,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.uvg.uvgcare.theme.UVGCareTheme
 
 @Composable
 fun ListItem() {
@@ -32,7 +34,11 @@ fun ListItem() {
             .fillMaxWidth()
             .padding(8.dp),
         shape = RoundedCornerShape(8.dp),
-        elevation = CardDefaults.cardElevation(4.dp)
+        elevation = CardDefaults.cardElevation(4.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surface, // Color de superficie del tema
+            contentColor = MaterialTheme.colorScheme.onSurface  // Color del contenido del tema
+        )
     ) {
         Row(
             modifier = Modifier
@@ -54,19 +60,20 @@ fun ListItem() {
             ) {
                 Text(
                     text = "List item",
-                    style = MaterialTheme.typography.titleMedium
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.onSurface // Color del texto según el tema
                 )
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
                     text = "Category • $$ • 1.2 miles away",
                     style = MaterialTheme.typography.bodyMedium,
-                    color = Color.Gray
+                    color = MaterialTheme.colorScheme.onSurfaceVariant // Color variante de texto
                 )
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
                     text = "Supporting line text lorem ipsum...",
                     style = MaterialTheme.typography.bodySmall,
-                    color = Color.Gray
+                    color = MaterialTheme.colorScheme.onSurfaceVariant // Otro color de variante de texto
                 )
             }
         }
@@ -81,7 +88,7 @@ fun FavoritesScreen() {
             TopAppBar(
                 title = { Text("Favoritos") },
                 colors = TopAppBarDefaults.mediumTopAppBarColors(
-                    containerColor = Color(0xFFFFEB3B)
+                    containerColor = MaterialTheme.colorScheme.primary // Usar color primario del tema
                 )
             )
         }
@@ -96,5 +103,21 @@ fun FavoritesScreen() {
                 ListItem()
             }
         }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun PreviewFavoritesScreenLight() {
+    UVGCareTheme(darkTheme = false) {
+        FavoritesScreen()
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun PreviewFavoritesScreenDark() {
+    UVGCareTheme(darkTheme = true) {
+        FavoritesScreen()
     }
 }

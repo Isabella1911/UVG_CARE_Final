@@ -136,18 +136,3 @@ fun PreviewNetflixStyleScreenLight() {
     }
 }
 
-@Preview(showBackground = true)
-@Composable
-fun PreviewNetflixStyleScreenDark() {
-    UVGCareTheme(darkTheme = true) { // Tema oscuro
-        NetflixStyleScreen()
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun PreviewNetflixStyleScreenMediumContrast() {
-    UVGCareTheme(useMediumContrast = true) { // Tema de contraste medio
-        NetflixStyleScreen()
-    }
-}
