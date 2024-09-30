@@ -38,19 +38,19 @@ fun CharacterProfileRoute(
 private fun CharacterProfileScreen(
     character: Character,
     onNavigateBack: () -> Unit,
-    text: String, // Text field value passed as parameter
-    onTextChange: (String) -> Unit, // Text change handler passed as parameter
+    text: String,
+    onTextChange: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(
         modifier = modifier
     ) {
-        // Full-width navigation space with text aligned left
+
         Box(
             modifier = Modifier
-                .fillMaxWidth()  // Full width
-                .height(56.dp)   // Standard app bar height
-                .background(MaterialTheme.colorScheme.primary)  // Background color
+                .fillMaxWidth()
+                .height(56.dp)
+                .background(MaterialTheme.colorScheme.primary)
         ) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
@@ -63,7 +63,7 @@ private fun CharacterProfileScreen(
                         tint = MaterialTheme.colorScheme.onPrimary
                     )
                 }
-                Spacer(modifier = Modifier.width(8.dp))  // Small space between icon and text
+                Spacer(modifier = Modifier.width(8.dp))
                 Text(
                     text = "Nombre del Objeto",
                     style = MaterialTheme.typography.titleLarge,
@@ -82,11 +82,11 @@ private fun CharacterProfileScreen(
         ) {
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Wider box for character icon
+
             Box(
                 modifier = Modifier
-                    .width(300.dp)   // Adjust width here
-                    .height(200.dp)  // Adjust height here
+                    .width(300.dp)
+                    .height(200.dp)
                     .background(MaterialTheme.colorScheme.secondaryContainer)
             ) {
                 Icon(
@@ -118,17 +118,17 @@ private fun CharacterProfileScreen(
 
             Spacer(modifier = Modifier.height(32.dp))
 
-            // Regular text box (no internal state management)
+
             OutlinedTextField(
                 value = text,
                 onValueChange = onTextChange,
                 placeholder = { Text("Descripción del objeto") },
-                modifier = Modifier.fillMaxWidth()  // Standard full-width text box
+                modifier = Modifier.fillMaxWidth()
             )
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Centered button
+
             Button(
                 onClick = { /* Handle button click */ },
                 modifier = Modifier.align(Alignment.CenterHorizontally)
@@ -158,7 +158,7 @@ private fun CharacterProfilePropItem(
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
 private fun PreviewCharacterProfileScreen() {
-    var text = ""  // External text state management
+    var text = ""
     UVGCareTheme {
         Surface {
             CharacterProfileScreen(
@@ -171,7 +171,7 @@ private fun PreviewCharacterProfileScreen() {
                 ),
                 onNavigateBack = { },
                 text = text,
-                onTextChange = { text = it }, // Handle text change
+                onTextChange = { text = it },
                 modifier = Modifier.fillMaxSize()
             )
         }

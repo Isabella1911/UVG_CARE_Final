@@ -5,13 +5,19 @@
       <SelectionState runConfigName="app">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
+      <SelectionState runConfigName="PreviewLogin">
+        <option name="selectionMode" value="DROPDOWN" />
+      </SelectionState>
+      <SelectionState runConfigName="PreviewCharacterProfileScreen (1)">
+        <option name="selectionMode" value="DROPDOWN" />
+      </SelectionState>
       <SelectionState runConfigName="PreviewNetflixStyleScreenLight">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="PreviewNetflixStyleScreenDark">
+      <SelectionState runConfigName="PreviewNetflixStyleScreenLight (1)">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="PreviewCharacterProfileScreen">
+      <SelectionState runConfigName="PreviewFavoritesScreenLight">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
     </selectionStates>

@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -25,10 +26,12 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.uvg.uvgcare.data.model.ItemObject
+import com.uvg.uvgcare.data.source.ObjectDb
 import com.uvg.uvgcare.theme.UVGCareTheme
 
 @Composable
-fun ListItem() {
+fun ListItem(obj: ItemObject) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -36,8 +39,8 @@ fun ListItem() {
         shape = RoundedCornerShape(8.dp),
         elevation = CardDefaults.cardElevation(4.dp),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface, // Color de superficie del tema
-            contentColor = MaterialTheme.colorScheme.onSurface  // Color del contenido del tema
+            containerColor = MaterialTheme.colorScheme.surface,
+            contentColor = MaterialTheme.colorScheme.onSurface
         )
     ) {
         Row(
@@ -45,10 +48,10 @@ fun ListItem() {
                 .fillMaxWidth()
                 .padding(16.dp)
         ) {
-            // Placeholder para imagen
+
             Image(
-                painter = painterResource(id = android.R.drawable.ic_menu_gallery),
-                contentDescription = "Image",
+                painter = painterResource(id = obj.imagen),
+                contentDescription = obj.nombre,
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
                     .size(56.dp)
@@ -58,37 +61,45 @@ fun ListItem() {
             Column(
                 modifier = Modifier.fillMaxWidth()
             ) {
+
                 Text(
-                    text = "List item",
+                    text = obj.nombre,
                     style = MaterialTheme.typography.titleMedium,
-                    color = MaterialTheme.colorScheme.onSurface // Color del texto según el tema
+                    color = MaterialTheme.colorScheme.onSurface
                 )
                 Spacer(modifier = Modifier.height(4.dp))
+
+
                 Text(
-                    text = "Category • $$ • 1.2 miles away",
+                    text = "${obj.categoria} • ${obj.contacto}", // Puedes ajustar según la información que desees mostrar
                     style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant // Color variante de texto
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
                 Spacer(modifier = Modifier.height(4.dp))
+
                 Text(
-                    text = "Supporting line text lorem ipsum...",
+                    text = obj.descripcion,
                     style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant // Otro color de variante de texto
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
         }
     }
 }
 
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FavoritesScreen() {
+    val objectDb = ObjectDb()
+    val favoriteObjects = objectDb.getAllObjects()
+
     Scaffold(
         topBar = {
             TopAppBar(
                 title = { Text("Favoritos") },
                 colors = TopAppBarDefaults.mediumTopAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primary // Usar color primario del tema
+                    containerColor = MaterialTheme.colorScheme.primary
                 )
             )
         }
@@ -99,12 +110,13 @@ fun FavoritesScreen() {
                 .fillMaxSize()
                 .padding(paddingValues)
         ) {
-            item {
-                ListItem()
+            items(favoriteObjects) { obj ->
+                ListItem(obj)
             }
         }
     }
 }
+
 
 @Preview(showBackground = true)
 @Composable
