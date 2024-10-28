@@ -38,8 +38,20 @@ import androidx.compose.ui.unit.dp
 import com.uvg.uvgcare.theme.UVGCareTheme
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.sp
+
 @Composable
-fun LoginPantalla(
+fun LoginRoute(
+    onLoginClick: () -> Unit,
+) {
+    LoginScreen(
+        onLoginClick = onLoginClick,
+        modifier = Modifier.fillMaxSize()
+    )
+}
+
+@Composable
+fun LoginScreen(
+    onLoginClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     var email by rememberSaveable {
@@ -50,26 +62,27 @@ fun LoginPantalla(
         mutableStateOf("")
     }
     val context = LocalContext.current
+
     Login(
         email = email,
         password = password,
         onEmailChange = { email = it },
         onPasswordChange = { password = it },
         onLoginClick = {
-            val message = if (email.isEmpty() || password.isEmpty()) {
-                "Error"
+            if (email.isEmpty() || password.isEmpty()) {
+                Toast.makeText(
+                    context,
+                    "Error: campos vacíos",
+                    Toast.LENGTH_LONG
+                ).show()
             } else {
-                "Login"
+                onLoginClick() // Navegar si las credenciales están completas
             }
-            Toast.makeText(
-                context,
-                message,
-                Toast.LENGTH_LONG
-            ).show()
         },
         modifier = modifier
     )
 }
+
 @Composable
 fun Login(
     email: String,
@@ -138,14 +151,4 @@ fun Login(
             }
     }
 
-@Preview(showBackground = true)
-@Composable
-private fun PreviewLogin() {
-    UVGCareTheme() {
-        Surface(
-            modifier = Modifier.fillMaxSize()
-        ) {
-            LoginPantalla()
-        }
-    }
-}
+

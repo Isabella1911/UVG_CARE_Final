@@ -1,4 +1,4 @@
-package com.uvg.uvgcare.presentation.list
+package com.uvg.uvgcare.presentation.mainFlow.list
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column

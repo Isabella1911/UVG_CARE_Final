@@ -1,4 +1,4 @@
-package com.uvg.uvgcare.presentation.Things.favlist
+package com.uvg.uvgcare.presentation.mainFlow.Things.favlist
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row

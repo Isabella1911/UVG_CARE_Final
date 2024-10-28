@@ -1,4 +1,4 @@
-package com.uvg.uvgcare.presentation.Things.profile
+package com.uvg.uvgcare.presentation.mainFlow.Things.profile
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
