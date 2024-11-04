@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "214493845286",
+    "project_id": "uvgcare",
+    "storage_bucket": "uvgcare.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:214493845286:android:b78ac38d4c7627d50a53e7",
+        "android_client_info": {
+          "package_name": "com.uvg.uvgcare"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB0EBgRTf1EQgYKub4iEW0atvRuFoz1XK8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
