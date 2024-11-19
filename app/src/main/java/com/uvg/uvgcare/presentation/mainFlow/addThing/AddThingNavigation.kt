@@ -1,13 +1,6 @@
 package com.uvg.uvgcare.presentation.mainFlow.addThing
 
-import androidx.navigation.NavGraphBuilder
-import androidx.navigation.compose.composable
-import com.uvg.uvgcare.presentation.login.LoginRoute
-import kotlinx.serialization.Serializable
-import androidx.navigation.NavType
-import androidx.navigation.compose.composable
-import androidx.navigation.navArgument
-
+/*
 @Serializable
 data object CharacterProfileDestination {
     const val ROUTE = "character_profile/{id}"
@@ -33,3 +26,4 @@ fun NavGraphBuilder.characterProfileScreen(
         )
     }
 }
+*/

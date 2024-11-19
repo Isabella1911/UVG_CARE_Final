@@ -1,8 +1,8 @@
-package com.uvg.uvgcare.presentation.mainFlow.list
+package com.uvg.uvgcare.firebase.home
 
-/*import kotlinx.serialization.Serializable
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
+import kotlinx.serialization.Serializable
 
 @Serializable
 data object NetflixStyleDestination {
@@ -11,7 +11,8 @@ data object NetflixStyleDestination {
 
 fun NavGraphBuilder.netflixStyleScreen() {
     composable(route = NetflixStyleDestination.ROUTE) {
-        NetflixStyleScreen()
+        NetflixStyleScreen()  // Fixed function name
     }
 }
-*/
+
+

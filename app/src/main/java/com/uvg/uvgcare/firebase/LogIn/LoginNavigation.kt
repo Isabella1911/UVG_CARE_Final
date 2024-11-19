@@ -1,5 +1,7 @@
-package com.uvg.uvgcare.presentation.login
-/*
+package com.uvg.uvgcare.firebase.LogIn
+
+
+
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import kotlinx.serialization.Serializable
@@ -10,13 +12,11 @@ data object LoginDestination {
 }
 
 fun NavGraphBuilder.loginScreen(
-    onLoginClick: () -> Unit
+    onLoginSuccess: () -> Unit
 ) {
     composable(route = LoginDestination.ROUTE) {
         LoginRoute(
-            onLoginClick = onLoginClick
+            onLoginSuccess = onLoginSuccess
         )
     }
 }
-
-*/

@@ -1,8 +1,8 @@
 package com.uvg.uvgcare.presentation.mainFlow.Things.favlist
-
-import kotlinx.serialization.Serializable
+/*
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
+import kotlinx.serialization.Serializable
 
 @Serializable
 data object FavoritesDestination {
@@ -14,3 +14,4 @@ fun NavGraphBuilder.favoritesScreen() {
         FavoritesScreen() // Llama a la función actual de la pantalla de favoritos
     }
 }
+*/

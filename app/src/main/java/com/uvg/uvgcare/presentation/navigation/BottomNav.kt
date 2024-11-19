@@ -1,5 +1,5 @@
 package com.uvg.uvgcare.presentation.navigation
-
+/*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material3.*
@@ -30,3 +30,4 @@ fun BottomNavBar(
         }
     }
 }
+*/

@@ -1,6 +1,7 @@
-package com.uvg.uvgcare.presentation.mainFlow.list
-/*
+package com.uvg.uvgcare.firebase.home
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
@@ -18,36 +19,37 @@ import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.uvg.uvgcare.data.model.ItemObject
 
-import com.uvg.uvgcare.data.source.ObjectDb
-import com.uvg.uvgcare.theme.UVGCareTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun NetflixStyleScreen() {
-    val objectDb = ObjectDb()
+fun NetflixStyleScreen(
+    viewModel: NetflixStyleViewModel = viewModel(factory = NetflixStyleViewModel.Factory)
+) {
+    val uiState by viewModel.uiState.collectAsState()
 
     Scaffold(
         topBar = {
@@ -59,38 +61,64 @@ fun NetflixStyleScreen() {
             )
         }
     ) { paddingValues ->
-        LazyColumn(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-        ) {
-            item {
-                val laboratorioObjects = objectDb.getObjectsByCategory("Laboratorio")
-                CategorySection(categoryName = "Laboratorio", itemObjects = laboratorioObjects)
+        when (uiState) {
+            is NetflixStyleUiState.Loading -> {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(paddingValues),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator()
+                }
             }
-            item {
-                val librosObjects = objectDb.getObjectsByCategory("Libros")
-                CategorySection(categoryName = "Libros", itemObjects = librosObjects)
+            is NetflixStyleUiState.Success -> {
+                val items = (uiState as NetflixStyleUiState.Success).items
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(paddingValues)
+                ) {
+                    item {
+                        CategorySection(
+                            categoryName = "Laboratorio",
+                            itemObjects = items,
+                            viewModel = viewModel
+                        )
+                    }
+                }
             }
-            item {
-                val electronicosObjects = objectDb.getObjectsByCategory("Electronicos")
-                CategorySection(categoryName = "Electronicos", itemObjects = electronicosObjects)
+            is NetflixStyleUiState.Error -> {
+                val errorMessage = (uiState as NetflixStyleUiState.Error).message
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(paddingValues),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = errorMessage,
+                        color = MaterialTheme.colorScheme.error,
+                        style = MaterialTheme.typography.bodyLarge
+                    )
+                }
             }
+
+
         }
     }
 }
 
-
 @Composable
-fun CategorySection(categoryName: String, itemObjects: List<com.uvg.uvgcare.data.model.ItemObject>) {
+fun CategorySection(
+    categoryName: String,
+    itemObjects: List<ItemObject>,
+    viewModel: NetflixStyleViewModel
+) {
     Column(modifier = Modifier.fillMaxWidth()) {
-
         Text(
             text = categoryName,
-            style = MaterialTheme.typography.titleLarge.copy(
-                fontWeight = FontWeight.Bold
-            ),
-            color = MaterialTheme.colorScheme.onBackground,
+            style = typography.titleLarge.copy(fontWeight = FontWeight.Bold),
             modifier = Modifier.padding(start = 16.dp, top = 16.dp, bottom = 8.dp)
         )
 
@@ -107,28 +135,32 @@ fun CategorySection(categoryName: String, itemObjects: List<com.uvg.uvgcare.data
             contentPadding = PaddingValues(horizontal = 16.dp)
         ) {
             items(itemObjects) { obj ->
-                ListItem(obj)
+                ListItem(
+                    obj = obj,
+                    viewModel = viewModel,
+                    onItemClick = { /* Navigate to detail */ }
+                )
             }
         }
     }
 }
 
 @Composable
-fun ListItem(obj: ItemObject) {
-
-    var isFavorite by remember { mutableStateOf(false) }
+fun ListItem(
+    obj: ItemObject,
+    viewModel: NetflixStyleViewModel,
+    onItemClick: () -> Unit
+) {
+    val isFavorite by viewModel.isItemFavorite(obj.id.toString()).collectAsState(initial = false)
 
     Card(
         modifier = Modifier
             .width(150.dp)
             .height(200.dp)
-            .padding(end = 16.dp),
+            .padding(end = 16.dp)
+            .clickable { onItemClick() },
         shape = RoundedCornerShape(8.dp),
-        elevation = CardDefaults.cardElevation(4.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface,
-            contentColor = MaterialTheme.colorScheme.onSurface
-        )
+        elevation = CardDefaults.cardElevation(4.dp)
     ) {
         Column(
             modifier = Modifier
@@ -136,7 +168,7 @@ fun ListItem(obj: ItemObject) {
                 .padding(8.dp)
         ) {
             Image(
-                painter = painterResource(id = obj.imagen), // Cargar la imagen desde drawables
+                painter = painterResource(id = obj.imagen),
                 contentDescription = obj.nombre,
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
@@ -148,37 +180,23 @@ fun ListItem(obj: ItemObject) {
 
             Text(
                 text = obj.nombre,
-                style = MaterialTheme.typography.titleMedium,
-                color = MaterialTheme.colorScheme.onSurface
+                style = typography.titleMedium
             )
 
             Text(
                 text = obj.descripcion,
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
+                style = typography.bodySmall
             )
 
-            Spacer(modifier = Modifier.height(8.dp))
-
-            IconButton(onClick = { isFavorite = !isFavorite }) {
+            IconButton(
+                onClick = { viewModel.toggleFavorite(obj) }
+            ) {
                 Icon(
                     imageVector = if (isFavorite) Icons.Filled.Favorite else Icons.Filled.FavoriteBorder,
-                    contentDescription = "Favorite Icon",
+                    contentDescription = if (isFavorite) "Remove from favorites" else "Add to favorites",
                     tint = if (isFavorite) Color.Red else MaterialTheme.colorScheme.onSurface
                 )
             }
         }
     }
 }
-
-
-
-@Preview(showBackground = true)
-@Composable
-fun PreviewNetflixStyleScreenLight() {
-    UVGCareTheme(darkTheme = false) { // Tema claro
-        NetflixStyleScreen()
-    }
-}
-
-*/

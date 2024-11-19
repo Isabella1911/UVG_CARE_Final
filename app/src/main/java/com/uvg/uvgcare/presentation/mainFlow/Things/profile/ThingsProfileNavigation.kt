@@ -1,5 +1,5 @@
 package com.uvg.uvgcare.presentation.mainFlow.Things.profile
-
+/*
 import kotlinx.serialization.Serializable
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavType
@@ -32,3 +32,4 @@ fun NavGraphBuilder.characterProfileScreen(
         )
     }
 }
+*/

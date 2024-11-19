@@ -1,5 +1,5 @@
 package com.uvg.uvgcare.presentation.mainFlow
-
+/*
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
@@ -79,3 +79,4 @@ fun MainFlowScreen(
 }
 
 
+*/

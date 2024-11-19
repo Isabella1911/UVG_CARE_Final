@@ -1,5 +1,5 @@
 package com.uvg.uvgcare.presentation.login
-
+/*
 import android.content.res.Configuration
 import android.widget.Toast
 import androidx.compose.foundation.Image
@@ -152,3 +152,4 @@ fun Login(
     }
 
 
+*/

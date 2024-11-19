@@ -1,5 +1,5 @@
 package com.uvg.uvgcare.presentation.navigation
-
+/*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Groups
 import androidx.compose.material.icons.filled.LocationOn
@@ -8,9 +8,9 @@ import androidx.compose.material.icons.outlined.Groups
 import androidx.compose.material.icons.outlined.LocationOn
 import androidx.compose.material.icons.outlined.Person
 import androidx.compose.ui.graphics.vector.ImageVector
-import com.uvg.uvgcare.presentation.mainFlow.Things.favlist.FavoritesDestination
+import com.uvg.uvgcare.firebase.FavoritesList.FavoritesDestination
+import com.uvg.uvgcare.firebase.home.NetflixStyleDestination
 import com.uvg.uvgcare.presentation.mainFlow.addThing.CharacterProfileDestination
-import com.uvg.uvgcare.presentation.mainFlow.list.NetflixStyleDestination
 
 data class NavItem(
     val title: String,
@@ -45,3 +45,4 @@ val topLevelDestinations = listOf(
     NetflixStyleDestination.ROUTE,
     CharacterProfileDestination.ROUTE
 )
+*/
