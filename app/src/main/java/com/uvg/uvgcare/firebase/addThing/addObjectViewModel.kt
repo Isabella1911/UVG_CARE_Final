@@ -1,6 +1,8 @@
 package com.uvg.uvgcare.firebase.addThing
 
+import FirestoreItemRepository
 import ItemObject
+import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -9,7 +11,6 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
-import com.uvg.uvgcare.firebase.Repository.FirestoreItemRepository
 import kotlinx.coroutines.launch
 
 class AddItemViewModel(
@@ -29,7 +30,6 @@ class AddItemViewModel(
         private set
     var isDropdownExpanded by mutableStateOf(false)
         private set
-
 
     // Categorías disponibles
     val categories = listOf("Laboratorio", "Libros", "Electrónicos")
@@ -61,7 +61,6 @@ class AddItemViewModel(
         println("Estado del menú desplegable: $isDropdownExpanded")
     }
 
-
     // Método para guardar un nuevo objeto en Firestore
     fun saveItem(onSuccess: () -> Unit, onError: (String) -> Unit) {
         viewModelScope.launch {
@@ -90,14 +89,20 @@ class AddItemViewModel(
                     timestamp = System.currentTimeMillis()
                 )
 
+                // Logs para debug
+                Log.d("AddItemViewModel", "Intentando guardar item: $newItem")
+
                 // Intentar guardar el objeto usando el repositorio
                 val result = repository.addItem(newItem)
                 if (result.isSuccess) {
+                    Log.d("AddItemViewModel", "Item guardado exitosamente")
                     onSuccess()
                 } else {
+                    Log.e("AddItemViewModel", "Error al guardar: ${result.exceptionOrNull()}")
                     onError(result.exceptionOrNull()?.message ?: "Error desconocido al guardar el objeto.")
                 }
             } catch (e: Exception) {
+                Log.e("AddItemViewModel", "Exception al guardar: ", e)
                 onError(e.message ?: "Ocurrió un error inesperado.")
             }
         }
@@ -114,4 +119,5 @@ class AddItemViewModel(
         }
     }
 }
+
 
