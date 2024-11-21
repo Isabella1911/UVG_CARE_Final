@@ -1,5 +1,3 @@
-package com.uvg.uvgcare.data.model
-
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -10,5 +8,7 @@ data class ItemObject(
     val contacto: String = "",
     val nombre: String = "",
     val descripcion: String = "",
-    val imagen: Int = 0
+    val imagen: String = "",
+    val autorId: String = "",
+    val timestamp: Long = System.currentTimeMillis() // Milisegundos desde el epoch
 )

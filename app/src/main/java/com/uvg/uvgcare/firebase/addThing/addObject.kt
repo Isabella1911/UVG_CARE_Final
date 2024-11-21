@@ -36,24 +36,19 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-
 fun AddItemScreen(
     viewModel: AddItemViewModel = viewModel(factory = AddItemViewModel.Factory),
     onNavigateBack: () -> Unit
 ) {
-    var text by remember { mutableStateOf("") }
-    var selectedCategory by remember { mutableStateOf("") }
-
     Box(
         modifier = Modifier.fillMaxSize()
     ) {
         Column(
-            modifier = Modifier
-                .padding(bottom = 80.dp)
+            modifier = Modifier.padding(bottom = 80.dp)
         ) {
-            // TopAppBar
             TopAppBar(
                 title = { Text("Publicar Objeto") },
                 colors = TopAppBarDefaults.mediumTopAppBarColors(
@@ -71,14 +66,15 @@ fun AddItemScreen(
             ) {
                 Spacer(modifier = Modifier.height(16.dp))
 
-                // Campos de entrada
+                // Nombre del objeto
                 OutlinedTextField(
-                    value = text,
-                    onValueChange = { text = it },
+                    value = viewModel.name,
+                    onValueChange = { viewModel.updateName(it) },
                     label = { Text("Nombre del objeto") },
                     modifier = Modifier.fillMaxWidth()
                 )
 
+                // Descripción
                 OutlinedTextField(
                     value = viewModel.description,
                     onValueChange = { viewModel.updateDescription(it) },
@@ -86,14 +82,14 @@ fun AddItemScreen(
                     modifier = Modifier.fillMaxWidth()
                 )
 
-                // Dropdown para categorías
+                // Categoría
                 ExposedDropdownMenuBox(
                     expanded = viewModel.isDropdownExpanded,
                     onExpandedChange = { viewModel.toggleDropdown() }
                 ) {
                     OutlinedTextField(
-                        value = selectedCategory,
-                        onValueChange = {},
+                        value = viewModel.selectedCategory,
+                        onValueChange = {}, // No se usa porque seleccionamos de la lista
                         readOnly = true,
                         label = { Text("Categoría") },
                         trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = viewModel.isDropdownExpanded) },
@@ -107,14 +103,15 @@ fun AddItemScreen(
                             DropdownMenuItem(
                                 text = { Text(category) },
                                 onClick = {
-                                    selectedCategory = category
-                                    viewModel.toggleDropdown()
+                                    viewModel.updateCategory(category) // Actualizar categoría seleccionada
                                 }
                             )
                         }
                     }
                 }
 
+
+                // Contacto
                 OutlinedTextField(
                     value = viewModel.contact,
                     onValueChange = { viewModel.updateContact(it) },
@@ -122,31 +119,15 @@ fun AddItemScreen(
                     modifier = Modifier.fillMaxWidth()
                 )
 
-                Spacer(modifier = Modifier.height(32.dp))
-
-                // Selector de imagen
-                Box(
-                    modifier = Modifier
-                        .size(100.dp)
-                        .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.2f))
-                        .clickable { viewModel.selectImage() }
-                ) {
-                    Icon(
-                        imageVector = Icons.Filled.Image,
-                        contentDescription = "Seleccionar imagen",
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(16.dp),
-                        tint = MaterialTheme.colorScheme.primary
-                    )
-                }
-
-                Button(
-                    onClick = { viewModel.selectImage() },
+                // URL de la imagen
+                OutlinedTextField(
+                    value = viewModel.imageUrl,
+                    onValueChange = { viewModel.updateImageUrl(it) },
+                    label = { Text("URL de la imagen") },
                     modifier = Modifier.fillMaxWidth()
-                ) {
-                    Text("Agregar imágenes")
-                }
+                )
+
+                Spacer(modifier = Modifier.height(32.dp))
             }
         }
 
@@ -167,8 +148,10 @@ fun AddItemScreen(
             Spacer(modifier = Modifier.width(16.dp))
             Button(
                 onClick = {
-                    viewModel.saveItem()
-                    onNavigateBack()
+                    viewModel.saveItem(
+                        onSuccess = { onNavigateBack() },
+                        onError = { /* Manejo de errores */ }
+                    )
                 },
                 modifier = Modifier.weight(1f)
             ) {

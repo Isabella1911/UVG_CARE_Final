@@ -1,4 +1,5 @@
 package com.uvg.uvgcare.firebase.home
+import ItemObject
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -41,7 +42,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.uvg.uvgcare.data.model.ItemObject
+import coil.compose.rememberAsyncImagePainter
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -123,8 +124,7 @@ fun CategorySection(
         )
 
         HorizontalDivider(
-            modifier = Modifier
-                .padding(horizontal = 16.dp)
+            modifier = Modifier                .padding(horizontal = 16.dp)
                 .fillMaxWidth(),
             thickness = 2.dp,
             color = MaterialTheme.colorScheme.primary
@@ -167,8 +167,9 @@ fun ListItem(
                 .fillMaxSize()
                 .padding(8.dp)
         ) {
+            // Cargar imagen desde URL con Coil
             Image(
-                painter = painterResource(id = obj.imagen),
+                painter = rememberAsyncImagePainter(model = obj.imagen),
                 contentDescription = obj.nombre,
                 contentScale = ContentScale.Crop,
                 modifier = Modifier

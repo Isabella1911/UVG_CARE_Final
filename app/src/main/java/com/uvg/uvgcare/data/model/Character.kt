@@ -1,5 +1,6 @@
 package com.uvg.uvgcare.data.model
 import kotlinx.serialization.Serializable
+
 @Serializable
 class Character(
     val id: Int,

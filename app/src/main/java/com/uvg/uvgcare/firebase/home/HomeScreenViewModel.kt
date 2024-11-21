@@ -1,11 +1,11 @@
 package com.uvg.uvgcare.firebase.home
 
+import ItemObject
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
-import com.uvg.uvgcare.data.model.ItemObject
 import com.uvg.uvgcare.firebase.FavoritesList.FavoriteItem
 import com.uvg.uvgcare.firebase.Repository.FirestoreFavoritesRepository
 import kotlinx.coroutines.flow.Flow

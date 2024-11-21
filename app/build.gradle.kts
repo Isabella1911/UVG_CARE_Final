@@ -81,6 +81,7 @@ dependencies {
     implementation(libs.androidx.navigation.fragment.ktx)
     implementation(libs.androidx.navigation.ui.ktx)
     implementation(libs.androidx.material3.android)
+    implementation("io.coil-kt:coil-compose:2.2.2")
 
     // Retrofit for API calls
     implementation(libs.retrofit)
