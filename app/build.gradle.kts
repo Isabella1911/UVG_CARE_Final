@@ -4,7 +4,6 @@ plugins {
     alias(libs.plugins.jetbrains.kotlin.serialization)
     alias(libs.plugins.google.services)
     alias(libs.plugins.crashlytics)
-
     id("kotlin-kapt")
 }
 
@@ -18,15 +17,24 @@ android {
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
+
+        // Añadido para resolver problemas de memoria
+        multiDexEnabled = true
+        renderscriptSupportModeEnabled = true
     }
 
     buildTypes {
         release {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
+            isShrinkResources = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+        }
+        debug {
+            isMinifyEnabled = false
+            isDebuggable = true
         }
     }
 
@@ -40,97 +48,99 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
 
     kotlinOptions {
-        jvmTarget = "1.8"
+        jvmTarget = "17"
     }
+
     packaging {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
+            // Añadido para evitar conflictos de dependencias
+            excludes += "META-INF/DEPENDENCIES"
+            excludes += "META-INF/LICENSE"
+            excludes += "META-INF/LICENSE.txt"
+            excludes += "META-INF/license.txt"
+            excludes += "META-INF/NOTICE"
+            excludes += "META-INF/NOTICE.txt"
+            excludes += "META-INF/notice.txt"
+            excludes += "META-INF/ASL2.0"
+            excludes += "META-INF/*.kotlin_module"
         }
     }
+
     kapt {
+        correctErrorTypes = true
         arguments {
             arg("room.schemaLocation", "$projectDir/schemas")
+            arg("room.incremental", "true")
+            arg("room.expandProjection", "true")
         }
     }
 }
 
 dependencies {
-    // Existing dependencies
+    // Compose BOM
+    implementation(platform(libs.androidx.compose.bom))
+
+    // Core dependencies
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
-    implementation(platform(libs.androidx.compose.bom))
+
+    // Compose dependencies
     implementation(libs.androidx.ui)
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
     implementation(libs.androidx.icons.extended)
     implementation(libs.androidx.compose.navigation)
-    implementation(libs.kotlinx.serialization.json)
-    implementation(libs.coil.compose)
-    implementation(libs.androidx.appcompat)
-    implementation(libs.material)
-    implementation(libs.androidx.constraintlayout)
-    implementation(libs.androidx.lifecycle.livedata.ktx)
-    implementation(libs.androidx.lifecycle.viewmodel.ktx)
-    implementation(libs.androidx.navigation.fragment.ktx)
-    implementation(libs.androidx.navigation.ui.ktx)
-    implementation(libs.androidx.material3.android)
-    implementation("io.coil-kt:coil-compose:2.2.2")
-
-    // Retrofit for API calls
-    implementation(libs.retrofit)
-    implementation(libs.retrofit.converter.gson)
-    implementation(libs.okhttp.logging)
-
-    // Room for local database
-    implementation(libs.room.runtime)
-    implementation(libs.room.ktx)
-    implementation(libs.firebase.auth.ktx)
-    implementation(libs.firebase.storage.ktx)
-    kapt(libs.room.compiler)
-    implementation(libs.firebase.bom)
-
-    // Hilt for dependency injection
-    implementation(libs.hilt.android)
-    kapt(libs.hilt.compiler)
-
-    // Existing test dependencies
-    testImplementation(libs.junit)
-    androidTestImplementation(libs.androidx.junit)
-    androidTestImplementation(libs.androidx.espresso.core)
-    androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
 
-    implementation(libs.androidx.core.ktx)
-    implementation(libs.androidx.lifecycle.runtime.ktx)
-    implementation(libs.androidx.activity.compose)
-    implementation(platform(libs.androidx.compose.bom))
-    implementation(libs.androidx.ui)
-    implementation(libs.androidx.icons.extended)
-    implementation(libs.androidx.compose.navigation)
-    implementation(libs.kotlinx.serialization.json)
-    implementation(libs.androidx.ui.graphics)
-    implementation(libs.androidx.ui.tooling.preview)
-    implementation(libs.androidx.material3)
-
-
+    // Firebase (usando BOM)
     implementation(platform(libs.firebase.bom))
     implementation(libs.bundles.firebase.libs)
     implementation(libs.kotlinx.coroutines.play.services)
 
+    // Navigation
+    implementation(libs.androidx.navigation.fragment.ktx)
+    implementation(libs.androidx.navigation.ui.ktx)
+
+    // Room
+    implementation(libs.room.runtime)
+    implementation(libs.room.ktx)
+    kapt(libs.room.compiler)
+
+    // Hilt
+    implementation(libs.hilt.android)
+    kapt(libs.hilt.compiler)
+
+    // Retrofit y networking
+    implementation(libs.retrofit)
+    implementation(libs.retrofit.converter.gson)
+    implementation(libs.okhttp.logging)
+
+    // Image loading
+    implementation("io.coil-kt:coil-compose:2.5.0")
+
+    // Serialization
+    implementation(libs.kotlinx.serialization.json)
+
+    // Testing
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
-    androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.ui.test.junit4)
-    debugImplementation(libs.androidx.ui.tooling)
-    debugImplementation(libs.androidx.ui.test.manifest)
-}
 
+    // Eliminar duplicados
+    implementation(libs.androidx.material3.android)
+    implementation(libs.androidx.lifecycle.livedata.ktx)
+    implementation(libs.androidx.lifecycle.viewmodel.ktx)
+
+    // MultiDex support
+    implementation("androidx.multidex:multidex:2.0.1")
+}

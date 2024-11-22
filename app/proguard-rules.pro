@@ -14,8 +14,110 @@
 
 # Uncomment this to preserve the line number information for
 # debugging stack traces.
-#-keepattributes SourceFile,LineNumberTable
+-keepattributes SourceFile,LineNumberTable
 
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
+
+# Firebase
+-keep class com.google.firebase.** { *; }
+-keep class com.google.android.gms.** { *; }
+-keep class com.google.firebase.crashlytics.** { *; }
+-keep class com.google.firebase.analytics.** { *; }
+
+# Compose
+-keep class androidx.compose.** { *; }
+-keepclassmembers class * extends androidx.compose.runtime.Composer {
+    <init>();
+}
+-keepclassmembers class * extends androidx.compose.runtime.State {
+    <init>();
+}
+
+# Navigation Component
+-keep class * extends androidx.navigation.Navigator
+-keepnames class androidx.navigation.**
+-keepnames class com.uvg.uvgcare.firebase.Navigation.**
+-keepnames class * extends android.os.Parcelable
+-keepnames class * extends java.io.Serializable
+
+# Kotlin Serialization
+-keepattributes *Annotation*, InnerClasses
+-dontnote kotlinx.serialization.AnnotationsKt
+-keepclassmembers class kotlinx.serialization.json.** {
+    *** Companion;
+}
+-keepclasseswithmembers class kotlinx.serialization.json.** {
+    kotlinx.serialization.KSerializer serializer(...);
+}
+
+# Room
+-keep class * extends androidx.room.RoomDatabase
+-keep @androidx.room.Entity class *
+-dontwarn androidx.room.paging.**
+
+# Retrofit
+-keepattributes Signature, InnerClasses, EnclosingMethod
+-keepattributes RuntimeVisibleAnnotations, RuntimeVisibleParameterAnnotations
+-keepclassmembers,allowshrinking,allowobfuscation interface * {
+    @retrofit2.http.* <methods>;
+}
+-dontwarn org.codehaus.mojo.animal_sniffer.IgnoreJRERequirement
+-dontwarn javax.annotation.**
+-dontwarn kotlin.Unit
+-dontwarn retrofit2.KotlinExtensions
+-dontwarn retrofit2.KotlinExtensions$*
+
+# OkHttp
+-dontwarn okhttp3.**
+-dontwarn okio.**
+-dontwarn javax.annotation.**
+-dontwarn org.conscrypt.**
+
+# Gson
+-keepattributes Signature
+-keepattributes *Annotation*
+-dontwarn sun.misc.**
+-keep class com.google.gson.** { *; }
+-keep class * implements com.google.gson.TypeAdapterFactory
+-keep class * implements com.google.gson.JsonSerializer
+-keep class * implements com.google.gson.JsonDeserializer
+
+# Coil
+-keep class coil.** { *; }
+-keep interface coil.** { *; }
+
+# Hilt
+-keepnames @dagger.hilt.android.lifecycle.HiltViewModel class * extends androidx.lifecycle.ViewModel
+-keep class dagger.hilt.** { *; }
+-keep class javax.inject.** { *; }
+-keep class * extends dagger.hilt.android.internal.managers.ViewComponentManager$FragmentContextWrapper { *; }
+
+# Keep your model classes
+-keep class com.uvg.uvgcare.data.model.** { *; }
+-keep class com.uvg.uvgcare.firebase.** { *; }
+
+# Coroutines
+-keepnames class kotlinx.coroutines.internal.MainDispatcherFactory {}
+-keepnames class kotlinx.coroutines.CoroutineExceptionHandler {}
+-keepclassmembers class kotlinx.coroutines.** {
+    volatile <fields>;
+}
+-keepclassmembers class kotlin.coroutines.** {
+    volatile <fields>;
+}
+-dontwarn kotlinx.coroutines.flow.**
+
+# Material Design
+-keep class com.google.android.material.** { *; }
+-dontwarn com.google.android.material.**
+-keep class androidx.compose.material3.** { *; }
+
+# ViewModels
+-keepclassmembers class * extends androidx.lifecycle.ViewModel {
+    <init>(...);
+}
+-keepclassmembers class * extends androidx.lifecycle.AndroidViewModel {
+    <init>(...);
+}

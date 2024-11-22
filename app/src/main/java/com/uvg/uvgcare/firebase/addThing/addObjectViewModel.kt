@@ -11,16 +11,12 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
-import com.google.firebase.firestore.FieldValue
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 class AddItemViewModel(
     private val repository: FirestoreItemRepository = FirestoreItemRepository()
 ) : ViewModel() {
 
-    // Campos observables para la pantalla
     var name by mutableStateOf("")
         private set
     var description by mutableStateOf("")
@@ -29,17 +25,15 @@ class AddItemViewModel(
         private set
     var selectedCategory by mutableStateOf("")
         private set
-    var imageUrl by mutableStateOf("") // URL de la imagen
+    var imageUrl by mutableStateOf("")
         private set
     var isDropdownExpanded by mutableStateOf(false)
         private set
-    var isLoading by mutableStateOf(false) // Estado de carga
+    var isLoading by mutableStateOf(false)
         private set
 
-    // Categorías disponibles
     val categories = listOf("Laboratorio", "Libros", "Electrónicos")
 
-    // Métodos para actualizar los campos
     fun updateName(newName: String) {
         name = newName
     }
@@ -62,35 +56,32 @@ class AddItemViewModel(
 
     fun toggleDropdown() {
         isDropdownExpanded = !isDropdownExpanded
-        println("Estado del menú desplegable: $isDropdownExpanded")
     }
 
     fun updateCategory(newCategory: String) {
         selectedCategory = newCategory
         isDropdownExpanded = false
-        println("Categoría seleccionada: $selectedCategory")
     }
 
     fun saveItem(onSuccess: (String) -> Unit, onError: (String) -> Unit) {
         viewModelScope.launch {
             isLoading = true
             try {
-                // Validar campos obligatorios
-                if (name.isBlank() || description.isBlank() || contact.isBlank() || selectedCategory.isBlank()) {
+                val currentUser = repository.auth.currentUser
+                if (currentUser == null) {
+                    onError("Usuario no autenticado")
+                    return@launch
+                }
+
+                if (name.isBlank() || description.isBlank() || contact.isBlank() || selectedCategory.isBlank() || imageUrl.isBlank()) {
                     onError("Todos los campos son obligatorios.")
                     return@launch
                 }
 
-                if (imageUrl.isBlank()) {
-                    onError("El campo de URL de la imagen no puede estar vacío.")
-                    return@launch
-                }
-
-                // Crear un nuevo objeto con los datos ingresados
                 val newItem = ItemObject(
-                    id = System.currentTimeMillis().toInt().toString(),
-                    autor = repository.auth.currentUser?.email ?: "",
-                    autorId = repository.auth.currentUser?.uid ?: "",
+                    id = "",  // El ID será asignado por Firestore
+                    autor = currentUser.email ?: "",
+                    autorId = currentUser.uid,
                     categoria = selectedCategory,
                     contacto = contact,
                     nombre = name,
@@ -99,41 +90,28 @@ class AddItemViewModel(
                     timestamp = System.currentTimeMillis()
                 )
 
-                Log.d("AddItemViewModel", "Intentando guardar item: $newItem")
-
-                // Guardar el objeto y obtener el ID
                 val result = repository.addItem(newItem)
                 if (result.isSuccess) {
-                    val itemId = result.getOrNull() ?: throw Exception("No se pudo obtener el ID del objeto guardado.")
-
-                    // Actualizar la lista del usuario
+                    val itemId = result.getOrNull() ?: throw Exception("Error al obtener ID del objeto")
                     repository.updateUserAddList(itemId)
-
-                    onSuccess("¡El objeto se guardó correctamente!")
+                    onSuccess("¡Objeto guardado exitosamente!")
                 } else {
-                    Log.e("AddItemViewModel", "Error al guardar: ${result.exceptionOrNull()}")
-                    onError(result.exceptionOrNull()?.message ?: "Error desconocido al guardar el objeto.")
+                    throw result.exceptionOrNull() ?: Exception("Error desconocido")
                 }
             } catch (e: Exception) {
-                Log.e("AddItemViewModel", "Exception al guardar: ", e)
-                onError(e.message ?: "Ocurrió un error inesperado.")
+                Log.e("AddItemViewModel", "Error al guardar", e)
+                onError(e.message ?: "Error inesperado al guardar")
             } finally {
                 isLoading = false
             }
         }
     }
 
-    // Factory para instanciar el ViewModel
     companion object {
         val Factory: ViewModelProvider.Factory = viewModelFactory {
             initializer {
-                AddItemViewModel(
-                    repository = FirestoreItemRepository()
-                )
+                AddItemViewModel(FirestoreItemRepository())
             }
         }
     }
 }
-
-
-
