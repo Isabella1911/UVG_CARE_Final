@@ -1,14 +1,11 @@
 package com.uvg.uvgcare.firebase.Repository
 
-import com.google.firebase.firestore.FirebaseFirestore
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.tasks.await
-import ItemObject
 import com.google.firebase.auth.FirebaseAuth
-import com.uvg.uvgcare.firebase.FavoritesList.FavoriteItem
 import com.google.firebase.firestore.FieldValue
+import com.google.firebase.firestore.FirebaseFirestore
+import com.uvg.uvgcare.firebase.FavoritesList.FavoriteItem
 import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.tasks.await
@@ -91,6 +88,7 @@ class FirestoreFavoritesRepository {
             throw Exception("Error al eliminar el favorito: ${e.message}")
         }
     }
+
 
 
 }

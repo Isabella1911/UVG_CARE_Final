@@ -1,6 +1,6 @@
 package com.uvg.uvgcare.firebase
 
-
+/*
 
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
@@ -31,4 +31,4 @@ fun FirebaseApp(
             MainScreen()
         }
     }
-}
+}*/
