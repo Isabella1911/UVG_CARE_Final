@@ -61,13 +61,8 @@ class NetflixStyleViewModel(
     fun toggleFavorite(item: ItemObject) {
         viewModelScope.launch {
             try {
-                // Usamos favoritesRepository que ya está instanciado en el ViewModel
                 val userId = favoritesRepository.getCurrentUserId()
-
-                if (userId == null) {
-                    _uiState.value = NetflixStyleUiState.Error("No hay usuario autenticado")
-                    return@launch
-                }
+                    ?: throw Exception("No hay usuario autenticado")
 
                 val favoriteItem = FavoriteItem(
                     id = item.id.toString(),
@@ -75,20 +70,22 @@ class NetflixStyleViewModel(
                     categoria = item.categoria,
                     contacto = item.contacto,
                     descripcion = item.descripcion,
-                    imagen = item.imagen
+                    imagen = item.imagen,
+                    autorId = item.autorId,
+                    timestamp = System.currentTimeMillis()
                 )
 
-                // Verificamos si está en favoritos usando el Flow
                 val isFavorited = favoritesRepository.isFavorite(item.id.toString()).first()
 
                 if (isFavorited) {
-                    // Si ya está en favoritos, lo removemos
                     favoritesRepository.removeFavoriteFromUser(userId, item.id.toString())
+                    println("Favorito eliminado: ${item.id}")
                 } else {
-                    // Si no está en favoritos, lo agregamos
                     favoritesRepository.addFavorite(userId, favoriteItem)
+                    println("Favorito agregado: ${item.id}")
                 }
             } catch (e: Exception) {
+                println("Error en toggleFavorite: ${e.message}")
                 _uiState.value = NetflixStyleUiState.Error(e.message ?: "Error al actualizar favoritos")
             }
         }

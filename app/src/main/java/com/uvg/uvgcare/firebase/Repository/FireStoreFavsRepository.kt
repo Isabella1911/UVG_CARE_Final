@@ -13,83 +13,98 @@ import kotlinx.coroutines.tasks.await
 class FirestoreFavoritesRepository {
     private val firestore = FirebaseFirestore.getInstance()
     private val usersCollection = firestore.collection("users")
-    private val db = FirebaseFirestore.getInstance()
 
-    // Obtener el ID del usuario actual
     fun getCurrentUserId(): String? {
         return FirebaseAuth.getInstance().currentUser?.uid
     }
 
-    // Agregar un ítem a la lista de favoritos del usuario
     suspend fun addFavorite(userId: String, item: FavoriteItem) {
         try {
-            val userDoc = usersCollection.document(userId)
-            userDoc.update("favorites", FieldValue.arrayUnion(item))
-                .await()
+            // Crear una subcolección "favorites" para el usuario
+            val userFavoritesRef = usersCollection
+                .document(userId)
+                .collection("favorites")
+                .document(item.id)
+
+            // Convertir el FavoriteItem a un Map
+            val favoriteData = mapOf(
+                "id" to item.id,
+                "nombre" to item.nombre,
+                "categoria" to item.categoria,
+                "contacto" to item.contacto,
+                "descripcion" to item.descripcion,
+                "imagen" to item.imagen,
+                "autorId" to item.autorId,
+                "timestamp" to item.timestamp
+            )
+
+            userFavoritesRef.set(favoriteData).await()
         } catch (e: Exception) {
             throw Exception("Error al agregar favorito: ${e.message}")
         }
     }
 
-    // Remover un ítem de la lista de favoritos del usuario
-    suspend fun removeFavorite(userId: String, itemId: String) {
-        try {
-            val userDoc = usersCollection.document(userId)
-            userDoc.update("favorites", FieldValue.arrayRemove(itemId))
-                .await()
-        } catch (e: Exception) {
-            throw Exception("Error al eliminar favorito: ${e.message}")
-        }
-    }
-
-    // Verificar si un ítem está en la lista de favoritos
+    // Actualizar el método de verificación
     fun isFavorite(itemId: String): Flow<Boolean> {
         val userId = getCurrentUserId() ?: return flowOf(false)
         return callbackFlow {
-            val userDoc = usersCollection.document(userId)
-            val registration = userDoc.addSnapshotListener { snapshot, error ->
-                if (error != null) {
-                    trySend(false)
-                    return@addSnapshotListener
+            val registration = usersCollection
+                .document(userId)
+                .collection("favorites")
+                .document(itemId)
+                .addSnapshotListener { snapshot, error ->
+                    if (error != null) {
+                        trySend(false)
+                        return@addSnapshotListener
+                    }
+                    trySend(snapshot?.exists() == true)
                 }
-                val favorites = snapshot?.get("favorites") as? List<String> ?: emptyList()
-                trySend(favorites.contains(itemId))
-            }
             awaitClose { registration.remove() }
         }
     }
 
-    // Obtener la lista de favoritos del usuario
-    fun getUserFavorites(userId: String): Flow<List<FavoriteItem>> = callbackFlow {
-        val favoritesRef = db.collection("users").document(userId).collection("favorites")
-
-        val listener = favoritesRef.addSnapshotListener { snapshot, exception ->
-            if (exception != null) {
-                close(exception)
-                return@addSnapshotListener
-            }
-
-            val favorites = snapshot?.documents?.mapNotNull { doc ->
-                doc.toObject(FavoriteItem::class.java)
-            } ?: emptyList()
-
-            trySend(favorites).isSuccess
-        }
-
-        awaitClose { listener.remove() }
-    }
-
+    // Actualizar el método de eliminación
     suspend fun removeFavoriteFromUser(userId: String, itemId: String) {
         try {
-            val userDoc = usersCollection.document(userId)
-            userDoc.update("favorites", FieldValue.arrayRemove(itemId))
+            usersCollection
+                .document(userId)
+                .collection("favorites")
+                .document(itemId)
+                .delete()
                 .await()
         } catch (e: Exception) {
             throw Exception("Error al eliminar el favorito: ${e.message}")
         }
     }
 
+    // Actualizar el método para obtener favoritos
+    fun getUserFavorites(userId: String): Flow<List<FavoriteItem>> = callbackFlow {
+        val listener = usersCollection
+            .document(userId)
+            .collection("favorites")
+            .addSnapshotListener { snapshot, error ->
+                if (error != null) {
+                    close(error)
+                    return@addSnapshotListener
+                }
 
+                val favorites = snapshot?.documents?.map { doc ->
+                    FavoriteItem(
+                        id = doc.id,
+                        nombre = doc.getString("nombre") ?: "",
+                        categoria = doc.getString("categoria") ?: "",
+                        contacto = doc.getString("contacto") ?: "",
+                        descripcion = doc.getString("descripcion") ?: "",
+                        imagen = doc.getString("imagen") ?: "",
+                        autorId = doc.getString("autorId") ?: "",
+                        timestamp = doc.getLong("timestamp") ?: System.currentTimeMillis()
+                    )
+                } ?: emptyList()
 
+                trySend(favorites)
+            }
+
+        awaitClose { listener.remove() }
+    }
 }
 

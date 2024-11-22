@@ -1,19 +1,9 @@
 package com.uvg.uvgcare.firebase.home
 
-
-
 import ItemObject
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
@@ -21,19 +11,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Divider
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -48,7 +26,8 @@ import coil.compose.rememberImagePainter
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NetflixStyleScreen(
-    viewModel: NetflixStyleViewModel = viewModel(factory = NetflixStyleViewModel.Factory)
+    viewModel: NetflixStyleViewModel = viewModel(factory = NetflixStyleViewModel.Factory),
+    onItemClick: (String) -> Unit = {}  // Nuevo parámetro para la navegación
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
@@ -100,27 +79,29 @@ fun NetflixStyleScreen(
                             CategorySection(
                                 categoryName = "Laboratorio",
                                 itemObjects = items.filter { it.categoria == "Laboratorio" },
-                                viewModel = viewModel
+                                viewModel = viewModel,
+                                onItemClick = onItemClick  // Pasar el callback
                             )
                         }
                         item {
                             CategorySection(
                                 categoryName = "Libros",
                                 itemObjects = items.filter { it.categoria == "Libros" },
-                                viewModel = viewModel
+                                viewModel = viewModel,
+                                onItemClick = onItemClick  // Pasar el callback
                             )
                         }
                         item {
                             CategorySection(
                                 categoryName = "Electrónicos",
                                 itemObjects = items.filter { it.categoria == "Electrónicos" },
-                                viewModel = viewModel
+                                viewModel = viewModel,
+                                onItemClick = onItemClick  // Pasar el callback
                             )
                         }
                     }
                 }
                 is NetflixStyleUiState.Error -> {
-                    val errorMessage = (uiState as NetflixStyleUiState.Error).message
                     Box(
                         modifier = Modifier
                             .fillMaxSize()
@@ -128,7 +109,7 @@ fun NetflixStyleScreen(
                         contentAlignment = Alignment.Center
                     ) {
                         Text(
-                            text = errorMessage,
+                            text = (uiState as NetflixStyleUiState.Error).message,
                             color = MaterialTheme.colorScheme.error,
                             style = MaterialTheme.typography.bodyLarge
                         )
@@ -143,7 +124,8 @@ fun NetflixStyleScreen(
 fun CategorySection(
     categoryName: String,
     itemObjects: List<ItemObject>,
-    viewModel: NetflixStyleViewModel
+    viewModel: NetflixStyleViewModel,
+    onItemClick: (String) -> Unit  // Nuevo parámetro
 ) {
     Column(
         modifier = Modifier
@@ -173,7 +155,7 @@ fun CategorySection(
                 ListItem(
                     obj = obj,
                     viewModel = viewModel,
-                    onItemClick = { /* Navegar a los detalles */ }
+                    onItemClick = { onItemClick(obj.id.toString()) }  // Pasar el ID del objeto
                 )
             }
         }
@@ -193,7 +175,7 @@ fun ListItem(
             .width(150.dp)
             .height(200.dp)
             .padding(end = 16.dp)
-            .clickable { onItemClick() },
+            .clickable(onClick = onItemClick),  // Usar el callback
         shape = RoundedCornerShape(8.dp),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surfaceVariant,
@@ -240,7 +222,5 @@ fun ListItem(
         }
     }
 }
-
-
 
 

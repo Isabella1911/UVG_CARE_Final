@@ -3,7 +3,6 @@ package com.uvg.uvgcare
 /*deje comentados algunos archivos que se repeteian ya que no queria borrarlos,
 igual los subi asi al repo para que queden de referencia*/
 
-
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -16,17 +15,19 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.uvg.uvgcare.firebase.FavoritesList.FavoritesScreen
 import com.uvg.uvgcare.firebase.LogIn.LoginDestination
 import com.uvg.uvgcare.firebase.LogIn.loginScreen
 import com.uvg.uvgcare.firebase.Navigation.MainBottomNavigation
+import com.uvg.uvgcare.firebase.Objects.ObjectProfileScreen
 import com.uvg.uvgcare.firebase.addThing.AddItemScreen
 import com.uvg.uvgcare.firebase.home.NetflixStyleScreen
-
 
 @Composable
 fun MainScreen(
@@ -38,7 +39,8 @@ fun MainScreen(
         containerColor = MaterialTheme.colorScheme.background,
         contentColor = MaterialTheme.colorScheme.onBackground,
         bottomBar = {
-            if (currentRoute != LoginDestination.ROUTE) {
+            if (currentRoute != LoginDestination.ROUTE &&
+                currentRoute != "object_profile/{itemId}") {
                 MainBottomNavigation(navController, currentRoute)
             }
         }
@@ -60,7 +62,11 @@ fun MainScreen(
                 )
 
                 composable(BottomNavItem.Home.route) {
-                    NetflixStyleScreen()
+                    NetflixStyleScreen(
+                        onItemClick = { itemId ->
+                            navController.navigate("object_profile/$itemId")
+                        }
+                    )
                 }
 
                 composable(BottomNavItem.AddItem.route) {
@@ -73,6 +79,25 @@ fun MainScreen(
 
                 composable(BottomNavItem.Favorites.route) {
                     FavoritesScreen()
+                }
+
+                // Nueva ruta para el perfil del objeto
+                composable(
+                    route = "object_profile/{itemId}",
+                    arguments = listOf(
+                        navArgument("itemId") {
+                            type = NavType.StringType
+                        }
+                    )
+                ) { backStackEntry ->
+                    val itemId = backStackEntry.arguments?.getString("itemId")
+                        ?: return@composable
+                    ObjectProfileScreen(
+                        itemId = itemId,
+                        onNavigateBack = {
+                            navController.navigateUp()
+                        }
+                    )
                 }
             }
         }

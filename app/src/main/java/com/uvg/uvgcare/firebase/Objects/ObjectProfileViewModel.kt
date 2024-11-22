@@ -2,18 +2,60 @@ package com.uvg.uvgcare.firebase.Objects
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.uvg.uvgcare.data.model.Character
 import com.uvg.uvgcare.firebase.FavoritesList.FavoriteItem
 import com.uvg.uvgcare.firebase.Repository.FirestoreFavoritesRepository
+import com.uvg.uvgcare.firebase.utils.AuthUtils
+import ItemObject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import com.google.firebase.firestore.FirebaseFirestore
 
-class CharacterProfileViewModel : ViewModel() {
+sealed class ObjectProfileUiState {
+    object Loading : ObjectProfileUiState()
+    data class Success(val item: ItemObject) : ObjectProfileUiState()
+    data class Error(val message: String) : ObjectProfileUiState()
+}
+
+class ObjectProfileViewModel : ViewModel() {
     private val repository = FirestoreFavoritesRepository()
+    private val firestore = FirebaseFirestore.getInstance()
+
+    private val _uiState = MutableStateFlow<ObjectProfileUiState>(ObjectProfileUiState.Loading)
+    val uiState: StateFlow<ObjectProfileUiState> = _uiState.asStateFlow()
+
     private val _isFavorite = MutableStateFlow(false)
     val isFavorite: StateFlow<Boolean> = _isFavorite.asStateFlow()
+
+    fun loadItemDetails(itemId: String) {
+        viewModelScope.launch {
+            try {
+                _uiState.value = ObjectProfileUiState.Loading
+
+                firestore.collection("items")
+                    .document(itemId)
+                    .get()
+                    .addOnSuccessListener { document ->
+                        if (document != null && document.exists()) {
+                            val item = document.toObject(ItemObject::class.java)
+                            if (item != null) {
+                                _uiState.value = ObjectProfileUiState.Success(item)
+                            } else {
+                                _uiState.value = ObjectProfileUiState.Error("No se pudo cargar el objeto")
+                            }
+                        } else {
+                            _uiState.value = ObjectProfileUiState.Error("Objeto no encontrado")
+                        }
+                    }
+                    .addOnFailureListener { e ->
+                        _uiState.value = ObjectProfileUiState.Error(e.message ?: "Error desconocido")
+                    }
+            } catch (e: Exception) {
+                _uiState.value = ObjectProfileUiState.Error(e.message ?: "Error desconocido")
+            }
+        }
+    }
 
     fun checkIfFavorite(itemId: String) {
         viewModelScope.launch {
@@ -22,42 +64,35 @@ class CharacterProfileViewModel : ViewModel() {
                     _isFavorite.value = isFav
                 }
             } catch (e: Exception) {
-                // Handle error
+                println("Error checking favorite status: ${e.message}")
             }
         }
     }
 
-    fun toggleFavorite(character: Character) {
+    fun toggleFavorite(item: ItemObject) {
         viewModelScope.launch {
             try {
-                // Obtener el ID del usuario actual
-                val userId = repository.getCurrentUserId()
+                val userId = AuthUtils.requireCurrentUserId()
 
-                // Verificar si tenemos un usuario válido
-                if (userId == null) {
-                    println("Error: No hay usuario autenticado")
-                    return@launch
-                }
+                val favoriteItem = FavoriteItem(
+                    id = item.id.toString(),
+                    nombre = item.nombre,
+                    categoria = item.categoria,
+                    contacto = item.contacto,
+                    descripcion = item.descripcion,
+                    imagen = item.imagen,
+                    autorId = item.autorId,
+                    timestamp = item.timestamp
+                )
 
                 if (_isFavorite.value) {
-                    // Si ya es favorito, lo removemos
-                    repository.removeFavorite(userId, character.id.toString())
+                    repository.removeFavoriteFromUser(userId, item.id.toString())
                 } else {
-                    // Si no es favorito, lo agregamos
-                    val favoriteItem = FavoriteItem(
-                        id = character.id.toString(),
-                        nombre = character.autor,
-                        categoria = character.categoria,
-                        contacto = character.contacto,
-                        descripcion = "", // Campo vacío por defecto
-                        imagen = character.imagen
-                    )
                     repository.addFavorite(userId, favoriteItem)
                 }
-                // Actualizamos el estado local
+
                 _isFavorite.value = !_isFavorite.value
             } catch (e: Exception) {
-                // Manejar el error
                 println("Error toggling favorite: ${e.message}")
             }
         }
