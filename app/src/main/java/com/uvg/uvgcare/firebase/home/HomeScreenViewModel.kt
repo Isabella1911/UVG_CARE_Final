@@ -1,5 +1,6 @@
 package com.uvg.uvgcare.firebase.home
 
+import FirestoreItemRepository
 import ItemObject
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -15,7 +16,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
-// NetflixStyleUiState.kt
+// Estado para manejar la UI del catálogo principal
 sealed class NetflixStyleUiState {
     data object Loading : NetflixStyleUiState()
     data class Success(val items: List<ItemObject>) : NetflixStyleUiState()
@@ -23,7 +24,8 @@ sealed class NetflixStyleUiState {
 }
 
 class NetflixStyleViewModel(
-    private val repository: FirestoreFavoritesRepository = FirestoreFavoritesRepository()
+    private val favoritesRepository: FirestoreFavoritesRepository = FirestoreFavoritesRepository(),
+    private val itemsRepository: FirestoreItemRepository = FirestoreItemRepository()
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow<NetflixStyleUiState>(NetflixStyleUiState.Loading)
@@ -33,21 +35,29 @@ class NetflixStyleViewModel(
         loadItems()
     }
 
+    // Método para cargar todos los objetos desde Firestore
     private fun loadItems() {
         viewModelScope.launch {
             try {
-                // Replace this with your actual data loading logic
-                _uiState.value = NetflixStyleUiState.Success(emptyList())
+                _uiState.value = NetflixStyleUiState.Loading
+                val result = itemsRepository.getAllItems()
+                if (result.isSuccess) {
+                    _uiState.value = NetflixStyleUiState.Success(result.getOrThrow())
+                } else {
+                    _uiState.value = NetflixStyleUiState.Error(result.exceptionOrNull()?.message ?: "Error desconocido")
+                }
             } catch (e: Exception) {
-                _uiState.value = NetflixStyleUiState.Error(e.message ?: "Unknown error occurred")
+                _uiState.value = NetflixStyleUiState.Error(e.message ?: "Error inesperado al cargar los objetos")
             }
         }
     }
 
+    // Método para verificar si un objeto está en favoritos
     fun isItemFavorite(itemId: String): Flow<Boolean> {
-        return repository.isFavorite(itemId)
+        return favoritesRepository.isFavorite(itemId)
     }
 
+    // Método para alternar entre añadir o eliminar un objeto de favoritos
     fun toggleFavorite(item: ItemObject) {
         viewModelScope.launch {
             try {
@@ -57,25 +67,27 @@ class NetflixStyleViewModel(
                     categoria = item.categoria,
                     contacto = item.contacto,
                     descripcion = item.descripcion,
-                    imagenUrl = item.imagen.toString()
+                    imagen = item.imagen
                 )
-                val isFavorited = repository.isFavorite(item.id.toString()).first()
+                val isFavorited = favoritesRepository.isFavorite(item.id.toString()).first()
                 if (isFavorited) {
-                    repository.removeFavorite(item.id.toString())
+                    //favoritesRepository.removeFavorite(item.id.toString())
                 } else {
-                    repository.addFavorite(favoriteItem)
+                    //favoritesRepository.addFavorite(favoriteItem)
                 }
             } catch (e: Exception) {
-                // Consider updating UI state to show error
-                _uiState.value = NetflixStyleUiState.Error(e.message ?: "Error toggling favorite")
+                _uiState.value = NetflixStyleUiState.Error(e.message ?: "Error al actualizar favoritos")
             }
         }
     }
+
     companion object {
         val Factory: ViewModelProvider.Factory = viewModelFactory {
             initializer {
                 NetflixStyleViewModel(
-                    repository = FirestoreFavoritesRepository())
+                    favoritesRepository = FirestoreFavoritesRepository(),
+                    itemsRepository = FirestoreItemRepository()
+                )
             }
         }
     }

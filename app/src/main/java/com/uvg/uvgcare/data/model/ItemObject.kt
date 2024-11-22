@@ -1,8 +1,10 @@
+import com.google.firebase.firestore.IgnoreExtraProperties
 import kotlinx.serialization.Serializable
 
 @Serializable
+@IgnoreExtraProperties
 data class ItemObject(
-    val id: Int,
+    val id: String = "", // Firebase requiere valores predeterminados
     val autor: String = "",
     val categoria: String = "",
     val contacto: String = "",
@@ -10,5 +12,5 @@ data class ItemObject(
     val descripcion: String = "",
     val imagen: String = "",
     val autorId: String = "",
-    val timestamp: Long = System.currentTimeMillis() // Milisegundos desde el epoch
+    val timestamp: Long = 0L // Valor predeterminado para compatibilidad
 )

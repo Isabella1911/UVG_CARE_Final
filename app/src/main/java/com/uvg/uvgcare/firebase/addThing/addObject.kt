@@ -35,7 +35,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-
+import androidx.compose.ui.tooling.preview.Preview
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -49,6 +49,7 @@ fun AddItemScreen(
         Column(
             modifier = Modifier.padding(bottom = 80.dp)
         ) {
+            // Barra superior
             TopAppBar(
                 title = { Text("Publicar Objeto") },
                 colors = TopAppBarDefaults.mediumTopAppBarColors(
@@ -57,6 +58,7 @@ fun AddItemScreen(
                 )
             )
 
+            // Contenido del formulario
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -66,7 +68,7 @@ fun AddItemScreen(
             ) {
                 Spacer(modifier = Modifier.height(16.dp))
 
-                // Nombre del objeto
+                // Campo: Nombre del objeto
                 OutlinedTextField(
                     value = viewModel.name,
                     onValueChange = { viewModel.updateName(it) },
@@ -74,7 +76,7 @@ fun AddItemScreen(
                     modifier = Modifier.fillMaxWidth()
                 )
 
-                // Descripción
+                // Campo: Descripción
                 OutlinedTextField(
                     value = viewModel.description,
                     onValueChange = { viewModel.updateDescription(it) },
@@ -82,36 +84,22 @@ fun AddItemScreen(
                     modifier = Modifier.fillMaxWidth()
                 )
 
-                // Categoría
-                ExposedDropdownMenuBox(
-                    expanded = viewModel.isDropdownExpanded,
-                    onExpandedChange = { viewModel.toggleDropdown() }
-                ) {
-                    OutlinedTextField(
-                        value = viewModel.selectedCategory,
-                        onValueChange = {}, // No se usa porque seleccionamos de la lista
-                        readOnly = true,
-                        label = { Text("Categoría") },
-                        trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = viewModel.isDropdownExpanded) },
-                        modifier = Modifier.fillMaxWidth()
-                    )
-                    ExposedDropdownMenu(
-                        expanded = viewModel.isDropdownExpanded,
-                        onDismissRequest = { viewModel.toggleDropdown() }
-                    ) {
-                        viewModel.categories.forEach { category ->
-                            DropdownMenuItem(
-                                text = { Text(category) },
-                                onClick = {
-                                    viewModel.updateCategory(category) // Actualizar categoría seleccionada
-                                }
-                            )
-                        }
-                    }
-                }
+                // Selección de Categoría usando botones
+                Text(
+                    text = "Seleccione una categoría:",
+                    style = MaterialTheme.typography.bodyLarge,
+                    modifier = Modifier
+                        .align(Alignment.Start)
+                        .padding(top = 8.dp, bottom = 4.dp)
+                )
 
+                CategoryButtonGroup(
+                    categories = viewModel.categories,
+                    selectedCategory = viewModel.selectedCategory,
+                    onCategorySelected = { category -> viewModel.updateCategory(category) }
+                )
 
-                // Contacto
+                // Campo: Contacto
                 OutlinedTextField(
                     value = viewModel.contact,
                     onValueChange = { viewModel.updateContact(it) },
@@ -119,7 +107,7 @@ fun AddItemScreen(
                     modifier = Modifier.fillMaxWidth()
                 )
 
-                // URL de la imagen
+                // Campo: URL de la imagen
                 OutlinedTextField(
                     value = viewModel.imageUrl,
                     onValueChange = { viewModel.updateImageUrl(it) },
@@ -150,7 +138,9 @@ fun AddItemScreen(
                 onClick = {
                     viewModel.saveItem(
                         onSuccess = { onNavigateBack() },
-                        onError = { /* Manejo de errores */ }
+                        onError = { errorMessage ->
+                            // Manejo de errores
+                        }
                     )
                 },
                 modifier = Modifier.weight(1f)
@@ -160,3 +150,46 @@ fun AddItemScreen(
         }
     }
 }
+
+@Composable
+fun CategoryButtonGroup(
+    categories: List<String>,
+    selectedCategory: String,
+    onCategorySelected: (String) -> Unit
+) {
+    Column(
+        modifier = Modifier.fillMaxWidth(),
+        verticalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        categories.forEach { category ->
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable { onCategorySelected(category) }
+                    .padding(8.dp)
+            ) {
+                // Indicador visual si está seleccionado
+                Box(
+                    modifier = Modifier
+                        .size(16.dp)
+                        .background(
+                            if (category == selectedCategory) MaterialTheme.colorScheme.primary
+                            else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
+                        )
+                )
+
+                Spacer(modifier = Modifier.width(8.dp))
+
+                Text(
+                    text = category,
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = if (category == selectedCategory) MaterialTheme.colorScheme.primary
+                    else MaterialTheme.colorScheme.onSurface
+                )
+            }
+        }
+    }
+}
+
+

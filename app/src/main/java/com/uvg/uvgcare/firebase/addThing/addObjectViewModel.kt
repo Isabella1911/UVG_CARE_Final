@@ -11,7 +11,10 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
+import com.google.firebase.firestore.FieldValue
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class AddItemViewModel(
     private val repository: FirestoreItemRepository = FirestoreItemRepository()
@@ -30,6 +33,8 @@ class AddItemViewModel(
         private set
     var isDropdownExpanded by mutableStateOf(false)
         private set
+    var isLoading by mutableStateOf(false) // Estado de carga
+        private set
 
     // Categorías disponibles
     val categories = listOf("Laboratorio", "Libros", "Electrónicos")
@@ -47,13 +52,12 @@ class AddItemViewModel(
         contact = newContact
     }
 
-    fun updateCategory(newCategory: String) {
-        selectedCategory = newCategory
-        isDropdownExpanded = false // Cerrar el menú después de seleccionar
-    }
-
     fun updateImageUrl(newUrl: String) {
-        imageUrl = newUrl
+        if (newUrl.startsWith("http://") || newUrl.startsWith("https://")) {
+            imageUrl = newUrl
+        } else {
+            Log.e("AddItemViewModel", "URL inválido: $newUrl")
+        }
     }
 
     fun toggleDropdown() {
@@ -61,9 +65,15 @@ class AddItemViewModel(
         println("Estado del menú desplegable: $isDropdownExpanded")
     }
 
-    // Método para guardar un nuevo objeto en Firestore
-    fun saveItem(onSuccess: () -> Unit, onError: (String) -> Unit) {
+    fun updateCategory(newCategory: String) {
+        selectedCategory = newCategory
+        isDropdownExpanded = false
+        println("Categoría seleccionada: $selectedCategory")
+    }
+
+    fun saveItem(onSuccess: (String) -> Unit, onError: (String) -> Unit) {
         viewModelScope.launch {
+            isLoading = true
             try {
                 // Validar campos obligatorios
                 if (name.isBlank() || description.isBlank() || contact.isBlank() || selectedCategory.isBlank()) {
@@ -78,25 +88,28 @@ class AddItemViewModel(
 
                 // Crear un nuevo objeto con los datos ingresados
                 val newItem = ItemObject(
-                    id = 0,
+                    id = System.currentTimeMillis().toInt().toString(),
                     autor = repository.auth.currentUser?.email ?: "",
                     autorId = repository.auth.currentUser?.uid ?: "",
                     categoria = selectedCategory,
                     contacto = contact,
                     nombre = name,
                     descripcion = description,
-                    imagen = imageUrl, // Guardar el URL ingresado
+                    imagen = imageUrl,
                     timestamp = System.currentTimeMillis()
                 )
 
-                // Logs para debug
                 Log.d("AddItemViewModel", "Intentando guardar item: $newItem")
 
-                // Intentar guardar el objeto usando el repositorio
+                // Guardar el objeto y obtener el ID
                 val result = repository.addItem(newItem)
                 if (result.isSuccess) {
-                    Log.d("AddItemViewModel", "Item guardado exitosamente")
-                    onSuccess()
+                    val itemId = result.getOrNull() ?: throw Exception("No se pudo obtener el ID del objeto guardado.")
+
+                    // Actualizar la lista del usuario
+                    repository.updateUserAddList(itemId)
+
+                    onSuccess("¡El objeto se guardó correctamente!")
                 } else {
                     Log.e("AddItemViewModel", "Error al guardar: ${result.exceptionOrNull()}")
                     onError(result.exceptionOrNull()?.message ?: "Error desconocido al guardar el objeto.")
@@ -104,6 +117,8 @@ class AddItemViewModel(
             } catch (e: Exception) {
                 Log.e("AddItemViewModel", "Exception al guardar: ", e)
                 onError(e.message ?: "Ocurrió un error inesperado.")
+            } finally {
+                isLoading = false
             }
         }
     }
@@ -119,5 +134,6 @@ class AddItemViewModel(
         }
     }
 }
+
 
 

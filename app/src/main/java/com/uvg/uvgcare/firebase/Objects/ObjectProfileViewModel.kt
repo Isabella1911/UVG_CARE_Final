@@ -28,28 +28,28 @@ class CharacterProfileViewModel : ViewModel() {
         }
     }
 
-    fun toggleFavorite(character: Character) {
-        viewModelScope.launch {
-            try {
-                if (_isFavorite.value) {
-                    repository.removeFavorite(character.id.toString())
-                } else {
-                    val favoriteItem = FavoriteItem(
-                        id = character.id.toString(),
-                        nombre = character.autor,
-                        categoria = character.categoria,
-                        contacto = character.contacto,
-                        descripcion = "",
-                        imagenUrl = character.imagen
-                    )
-                    repository.addFavorite(favoriteItem)
-                }
-                _isFavorite.value = !_isFavorite.value
-            } catch (e: Exception) {
-                // Handle error
-            }
-        }
-    }
+    //fun toggleFavorite(character: Character) {
+    //    viewModelScope.launch {
+    //        try {
+    //            if (_isFavorite.value) {
+    //                repository.removeFavorite(character.id.toString())
+    //            } else {
+    //                val favoriteItem = FavoriteItem(
+    //                    id = character.id.toString(),
+    //                    nombre = character.autor,
+    //                    categoria = character.categoria,
+    //                    contacto = character.contacto,
+    //                    descripcion = "",
+    //                    imagen = character.imagen
+    //                )
+    //                repository.addFavorite(favoriteItem)
+    //            }
+    //            _isFavorite.value = !_isFavorite.value
+    //        } catch (e: Exception) {
+    //            // Handle error
+    //        }
+    //    }
+    //
 }
 
 

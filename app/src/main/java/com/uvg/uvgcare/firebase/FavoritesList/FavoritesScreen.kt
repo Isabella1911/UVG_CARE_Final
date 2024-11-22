@@ -1,5 +1,6 @@
 package com.uvg.uvgcare.firebase.FavoritesList
 
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -13,6 +14,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -22,6 +24,7 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
@@ -33,7 +36,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 fun FavoritesScreen(
     viewModel: FavoritesViewModel = viewModel()
 ) {
-    val favorites by viewModel.favorites.collectAsState()
+    val uiState by viewModel.uiState.collectAsState()
 
     Scaffold(
         topBar = {
@@ -45,13 +48,54 @@ fun FavoritesScreen(
             )
         }
     ) { paddingValues ->
-        LazyColumn(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-        ) {
-            items(favorites) { favorite ->
-                ListItem(favorite)
+        when (uiState) {
+            is FavoritesUiState.Loading -> {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(paddingValues),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator()
+                }
+            }
+            is FavoritesUiState.Success -> {
+                val favorites = (uiState as FavoritesUiState.Success).favorites
+                if (favorites.isEmpty()) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(paddingValues),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text("No tienes favoritos aún")
+                    }
+                } else {
+                    LazyColumn(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(paddingValues)
+                    ) {
+                        items(favorites) { favorite ->
+                            ListItem(favorite)
+                        }
+                    }
+                }
+            }
+            is FavoritesUiState.Error -> {
+                val errorMessage = (uiState as FavoritesUiState.Error).message
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(paddingValues),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = errorMessage,
+                        color = MaterialTheme.colorScheme.error,
+                        style = MaterialTheme.typography.bodyLarge
+                    )
+                }
             }
         }
     }
@@ -71,9 +115,8 @@ fun ListItem(favorite: FavoriteItem) {
                 .fillMaxWidth()
                 .padding(16.dp)
         ) {
-            // Para las imágenes, puedes usar Coil o Glide
             AsyncImage(
-                model = favorite.imagenUrl,
+                model = favorite.imagen,
                 contentDescription = favorite.nombre,
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
@@ -102,3 +145,4 @@ fun ListItem(favorite: FavoriteItem) {
         }
     }
 }
+

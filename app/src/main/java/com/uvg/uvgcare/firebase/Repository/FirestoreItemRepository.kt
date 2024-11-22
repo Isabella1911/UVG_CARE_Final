@@ -1,12 +1,16 @@
+import android.util.Log
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 import kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.withContext
 
 class FirestoreItemRepository {
     val auth: FirebaseAuth = FirebaseAuth.getInstance()
     private val firestore: FirebaseFirestore = FirebaseFirestore.getInstance()
     private val itemsCollection = firestore.collection("items")
+    private val usersCollection = firestore.collection("users")
 
     suspend fun addItem(item: ItemObject): Result<String> {
         return try {
@@ -71,6 +75,21 @@ class FirestoreItemRepository {
             Result.success(items)
         } catch (e: Exception) {
             Result.failure(e)
+        }
+    }
+
+    suspend fun updateUserAddList(itemId: String) {
+        try {
+            // Verificar que el usuario esté autenticado
+            val userId = auth.currentUser?.uid ?: throw Exception("Usuario no autenticado.")
+            val userDocRef = usersCollection.document(userId)
+
+            // Agregar el itemId al campo "addList"
+            userDocRef.update("addList", FieldValue.arrayUnion(itemId)).await()
+            Log.d("FirestoreItemRepository", "Item $itemId añadido a la lista de creados del usuario $userId")
+        } catch (e: Exception) {
+            Log.e("FirestoreItemRepository", "Error al actualizar addList: ${e.message}")
+            throw e
         }
     }
 }
